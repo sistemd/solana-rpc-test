@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::time::{Duration, Instant};
 
 const SOLANA_BLOCK_NOT_AVAILABLE_ERROR: i64 = -32004;
+const SOLANA_BLOCK_SKIPPED_ERROR: i64 = -32007;
 const FETCH_RETRY_DELAY: Duration = Duration::from_millis(500);
 
 #[tokio::main]
@@ -47,6 +48,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if let Some(error) = get_block_resp.error {
             if error.code == SOLANA_BLOCK_NOT_AVAILABLE_ERROR {
                 tokio::time::sleep(FETCH_RETRY_DELAY).await;
+            } else if error.code == SOLANA_BLOCK_SKIPPED_ERROR {
+                println!("slot: {} | skipped", slot_to_fetch);
+                slot_to_fetch += 1;
             } else {
                 println!("error: {}", error);
             }
