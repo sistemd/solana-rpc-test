@@ -47,10 +47,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         if let Some(error) = get_block_resp.error {
             if error.code == SOLANA_BLOCK_NOT_AVAILABLE_ERROR {
                 tokio::time::sleep(FETCH_RETRY_DELAY).await;
-                continue;
             } else {
-                return Err(error.into());
+                println!("error: {}", error);
             }
+            continue;
         }
 
         let Some(block) = get_block_resp.result else {
